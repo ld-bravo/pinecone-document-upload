@@ -167,7 +167,8 @@ class PDFVectorSearch:
 
         # Generate answer
         response = self.openai_client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            # model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that answers questions based on given context."},
                 {"role": "user", "content": prompt}
