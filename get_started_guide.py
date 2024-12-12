@@ -12,40 +12,43 @@ print("Pinecone API key: ", PINECONE_API_KEY)
 
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
+
 def create_pinecone_index():
-  pc.create_index(
-      name=INDEX_NAME,
-      dimension=1024,  # Replace with your model dimensions
-      metric="cosine",  # Replace with your model metric
-      spec=ServerlessSpec(
-          cloud="aws",
-          region="us-east-1"
-      )
-  )
+    pc.create_index(
+        name=INDEX_NAME,
+        dimension=1024,  # Replace with your model dimensions
+        metric="cosine",  # Replace with your model metric
+        spec=ServerlessSpec(
+            cloud="aws",
+            region="us-east-1"
+        )
+    )
+
 
 def create_vector_embeddings():
-  data = [
-      {"id": "vec1", "text": "Apple is a popular fruit known for its sweetness and crisp texture."},
-      {"id": "vec2", "text": "The tech company Apple is known for its innovative products like the iPhone."},
-      {"id": "vec3", "text": "Many people enjoy eating apples as a healthy snack."},
-      {"id": "vec4", "text": "Apple Inc. has revolutionized the tech industry with its sleek designs and user-friendly interfaces."},
-      {"id": "vec5", "text": "An apple a day keeps the doctor away, as the saying goes."},
-      {"id": "vec6", "text": "Apple Computer Company was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne as a partnership."}
-  ]
+    data = [
+        {"id": "vec1", "text": "Apple is a popular fruit known for its sweetness and crisp texture."},
+        {"id": "vec2", "text": "The tech company Apple is known for its innovative products like the iPhone."},
+        {"id": "vec3", "text": "Many people enjoy eating apples as a healthy snack."},
+        {"id": "vec4", "text": "Apple Inc. has revolutionized the tech industry with its sleek designs and user-friendly interfaces."},
+        {"id": "vec5", "text": "An apple a day keeps the doctor away, as the saying goes."},
+        {"id": "vec6", "text": "Apple Computer Company was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne as a partnership."}
+    ]
 
-  embeddings = pc.inference.embed(
-      model="multilingual-e5-large",
-      inputs=[d['text'] for d in data],
-      parameters={"input_type": "passage", "truncate": "END"}
-  )
+    embeddings = pc.inference.embed(
+        model="multilingual-e5-large",
+        inputs=[d['text'] for d in data],
+        parameters={"input_type": "passage", "truncate": "END"}
+    )
 
-  print(embeddings[0])
-  
-  return {
-      "data": data,
-      "embeddings": embeddings
+    print(embeddings[0])
+
+    return {
+        "data": data,
+        "embeddings": embeddings
     }
-  
+
+
 def upsert_data(data, embeddings):
     # Wait for the index to be ready
     while not pc.describe_index(INDEX_NAME).status['ready']:
@@ -65,9 +68,10 @@ def upsert_data(data, embeddings):
         vectors=vectors,
         namespace="ns1"
     )
-    
+
     print(index.describe_index_stats())
-    
+
+
 def query_vector():
     query = "Tell me about the tech company known as Apple."
     index = pc.Index(INDEX_NAME)
@@ -79,7 +83,7 @@ def query_vector():
             "input_type": "query"
         }
     )
-    
+
     results = index.query(
         namespace="ns1",
         vector=embedding[0].values,
@@ -89,7 +93,8 @@ def query_vector():
     )
 
     print(results)
-        
+
+
 if __name__ == "__main__":
     try:
         # print("Creating Pinecone index...")
