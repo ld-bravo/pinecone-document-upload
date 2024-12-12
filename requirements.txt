@@ -1,0 +1,9 @@
+certifi==2024.8.30
+pinecone==5.4.2
+pinecone-plugin-inference==3.1.0
+pinecone-plugin-interface==0.0.7
+python-dateutil==2.9.0.post0
+six==1.17.0
+tqdm==4.67.1
+typing_extensions==4.12.2
+urllib3==2.2.3
