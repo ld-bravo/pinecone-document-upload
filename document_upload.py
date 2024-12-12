@@ -23,13 +23,9 @@ class PDFVectorSearch:
 
         # Create or connect to Pinecone index
         index_name = 'pdf-search-index'
-        indexes = pc.list_indexes()
-        indexes_names = []
+        indexes = pc.list_indexes().names()
 
-        for index in indexes:
-            indexes_names.append(index.name)
-
-        if index_name not in indexes_names:
+        if index_name not in indexes:
             pc.create_index(
                 name=index_name,
                 dimension=1536,
