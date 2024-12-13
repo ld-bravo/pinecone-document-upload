@@ -24,7 +24,6 @@ def create_pinecone_index():
         )
     )
 
-
 def create_vector_embeddings():
     data = [
         {"id": "vec1", "text": "Apple is a popular fruit known for its sweetness and crisp texture."},
@@ -47,7 +46,6 @@ def create_vector_embeddings():
         "data": data,
         "embeddings": embeddings
     }
-
 
 def upsert_data(data, embeddings):
     # Wait for the index to be ready
@@ -93,7 +91,6 @@ def query_vector():
     )
 
     print(results)
-
 
 if __name__ == "__main__":
     try:
