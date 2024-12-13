@@ -163,7 +163,7 @@ if __name__ == "__main__":
     search_manager = SemanticSearchManager()
 
     # Example query
-    query = "What is the name of the pacient and how old is she?"
+    query = "What is the name of the pacient?"
 
     # LangChain Semantic Search
     print("=== LangChain Semantic Search ===")

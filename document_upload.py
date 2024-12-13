@@ -8,8 +8,7 @@ from pinecone import Pinecone, ServerlessSpec
 # Load environment variables
 load_dotenv()
 
-
-class PDFVectorSearch:
+class DocumentManager:
     def __init__(self):
         # Initialize OpenAI client
         self.openai_client = OpenAI(
@@ -22,7 +21,7 @@ class PDFVectorSearch:
         )
 
         # Create or connect to Pinecone index
-        index_name = 'pdf-search-index'
+        index_name = os.environ.get("PINECONE_INDEX_NAME")
         indexes = pc.list_indexes().names()
 
         if index_name not in indexes:
@@ -117,81 +116,15 @@ class PDFVectorSearch:
         self.index.upsert(vectors)
         print(f"Uploaded {len(vectors)} chunks to Pinecone")
 
-    def query_pdf_content(self, query: str, top_k: int = 5) -> List[str]:
-        """
-        Query the indexed PDF content.
-
-        :param query: Search query
-        :param top_k: Number of top results to retrieve
-        :return: List of most relevant text chunks
-        """
-        # Generate embedding for query
-        query_embedding = self.generate_embeddings([query])[0]
-
-        # Query Pinecone
-        query_results = self.index.query(
-            vector=query_embedding,
-            top_k=top_k,
-            include_metadata=True
-        )
-
-        # Extract and return relevant text chunks
-        return [
-            match['metadata']['text']
-            for match in query_results['matches']
-        ]
-
-    def answer_query(self, query: str) -> str:
-        """
-        Generate an answer using retrieved context and OpenAI.
-
-        :param query: User's query
-        :return: Generated answer
-        """
-        # Retrieve relevant context
-        context_chunks = self.query_pdf_content(query)
-
-        # Prepare prompt with context
-        prompt = f"""
-        Context: {' '.join(context_chunks)}
-
-        Question: {query}
-
-        Based on the provided context, answer the question thoroughly and precisely.
-        If the answer is not in the context, state that you cannot find the information.
-        """
-
-        # Generate answer
-        response = self.openai_client.chat.completions.create(
-            # model="gpt-3.5-turbo",
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that answers questions based on given context."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-
-        return response.choices[0].message.content
-
 # Example usage
 
 
 def main():
     # Initialize the PDF Vector Search
-    pdf_search = PDFVectorSearch()
+    document_manager = DocumentManager()
 
     # Upload a PDF (replace with your PDF path)
-    # pdf_search.upload_to_pinecone('sample-document.pdf')
-
-    # Query the uploaded PDF
-    query = "Can you tell what are the health problems of Teresa?"
-    # results = pdf_search.query_pdf_content(query)
-    # print("Relevant Chunks:", results)
-
-    # Get an AI-generated answer
-    answer = pdf_search.answer_query(query)
-    print("AI Answer:", answer)
-
+    document_manager.upload_to_pinecone('document.pdf')
 
 if __name__ == "__main__":
     main()
